@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# test with 'curl localhost:8080/testname/'
+# test with 'curl localhost:8080'
 import socket
 import time
 import _thread
@@ -13,20 +13,19 @@ s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 s.bind(("0.0.0.0", SERVER_PORT))
 s.listen(10) # 10 is the backlog
 
-# write a valid http response. response will be truncated to content length because it is hardcoded
+# write a valid http response
 http_response = b"""HTTP/1.1 200 OK\r
 Content-Length: 10\r
 
-hi NAME!\n\r\n"""
+hi there!\n\r\n"""
 
 def respond(conn):
     # print out once we get the connection
-    request = conn.recv(4096)
-    name = request.split(b'/')[1]
+    print(str(conn.recv(4096)))
     # introduce a wait to simulate slow communication, server response, etc
-    # time.sleep(0.5)
+    time.sleep(0.5)
     # send response
-    conn.send(http_response.replace(b'NAME', name))
+    conn.send(http_response)
     # shutdown, close the connection
     conn.shutdown(socket.SHUT_WR)
     conn.close()
